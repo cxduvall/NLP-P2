@@ -130,7 +130,7 @@ def transform_cuisine(url):
 
 def double_amount(url):
     ingredients_frame, steps_frame, primary_method = recipe_parse.parse(url)
-    print(ingredients_frame)
+    #print(ingredients_frame)
     
     for ingredient in ingredients_frame:
         ingredient["quantity"] = str(Fraction(float(ingredient["quantity"]) * 2))

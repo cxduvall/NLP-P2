@@ -6,6 +6,7 @@ from string import punctuation
 pp = pprint.PrettyPrinter(indent=1)
 
 def parse(url):
+    debug = True
     common_cooking_methods = ["bake", "fry", "sauté", "broil", "boil", "poach", "grill", "steam", "cook"]
     common_other_methods = ["chop", "grate", "stir", "shake", "mince", "crush", "squeeze"]
     common_tools = ['bowl','skillet','whisk','microwave-safe bowl','large bowl', 'strainer', 'slotted spoon','cup', 'saucepan','plastic bag','broiler pan','brush', 'springform pan','baking pan']
@@ -14,7 +15,7 @@ def parse(url):
     page = requests.get(url)
     #page = requests.get("https://www.allrecipes.com/recipe/24074/alysias-basic-meat-lasagna/")
     soup = BeautifulSoup(page.content, 'html.parser')
-    #print(soup.prettify())
+    if debug: print(soup.prettify())
 
     ingredients = soup.find_all("span", class_="ingredients-item-name")
     ingredients = [ingredient.get_text() for ingredient in ingredients]
@@ -37,8 +38,6 @@ def parse(url):
         ingredient_frame_lst.append({"quantity": quantity, "unit": unit, "name": ingredient, "type" : type})
         ingredients_lst.append(ingredient)
 
-    #pp.pprint(ingredient_frame_lst)-----
-
     steps_data = soup.find_all("li", class_="subcontainer instructions-section-item")
     steps_frame_lst = [{"text": step.text} for step in steps_data]
     # extract info for each step
@@ -54,7 +53,6 @@ def parse(url):
         for j in range(len(step["text_split"])):
             if step["text_split"][j] in time_units:
                 step["time"] = (step["text_split"][i - 1])
-    # pp.pprint(steps_frame_lst)-----
 
     primary_method = steps_frame_lst[0]["method"]
     for i in steps_frame_lst:
@@ -62,7 +60,10 @@ def parse(url):
             primary_method = i["method"]
             break
 
-    # print("Primary cooking method: ", primary_method)----
+    if debug:
+        pp.pprint(ingredient_frame_lst)
+        pp.pprint(steps_frame_lst)
+        print("Primary cooking method: ", primary_method)
 
     return (ingredient_frame_lst, steps_frame_lst, primary_method)
 
